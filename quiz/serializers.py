@@ -1,7 +1,9 @@
+import pdb
+
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from quiz.models import Quiz, Question, QUESTION_TYPES
+from quiz.models import Quiz, Question, QUESTION_TYPES, Answer
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -31,7 +33,7 @@ class QuestionSerializer(serializers.Serializer):
 class QuizSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField()
-    start_date = serializers.DateTimeField()
+    start_date = serializers.DateTimeField(read_only=True)
     end_date = serializers.DateTimeField()
     description = serializers.CharField()
     questions = QuestionSerializer(many=True)
@@ -45,3 +47,21 @@ class QuizSerializer(serializers.Serializer):
         instance.description = validated_data.get('description', instance.description)
         instance.save()
         return instance
+
+
+class AnswerSerializer(serializers.Serializer):
+    answer_text = serializers.CharField()
+    user_id = serializers.IntegerField()
+    question = serializers.PrimaryKeyRelatedField(queryset=Question.objects.all())
+
+    def create(self, validated_data):
+        return Answer.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        pass
+
+    def to_representation(self, instance):
+        return {
+            'question': instance.question.question_text,
+            'answer': instance.answer_text
+        }

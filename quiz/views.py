@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from quiz.models import Quiz, Question, Answer
 from quiz.permissions import IsAdminUserOrRestricted
-from quiz.serializers import QuizSerializer, QuestionSerializer, AnswerSerializer
+from quiz.serializers import QuizSerializer, QuestionSerializer, AnswerSerializer, QuizSerializerWithoutReadOnlyFields
 
 
 class QuizList(generics.ListCreateAPIView):
@@ -26,6 +26,9 @@ class QuizDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdminUserOrRestricted]
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
+
+    def get_serializer_class(self):
+        return QuizSerializerWithoutReadOnlyFields if self.request.method == 'PUT' else self.serializer_class
 
 
 class QuestionDetail(generics.RetrieveUpdateDestroyAPIView):

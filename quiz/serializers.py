@@ -33,7 +33,7 @@ class QuestionSerializer(serializers.Serializer):
 class QuizSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField()
-    start_date = serializers.DateTimeField(read_only=True)
+    start_date = serializers.DateTimeField()
     end_date = serializers.DateTimeField()
     description = serializers.CharField()
     questions = QuestionSerializer(many=True)
@@ -47,6 +47,10 @@ class QuizSerializer(serializers.Serializer):
         instance.description = validated_data.get('description', instance.description)
         instance.save()
         return instance
+
+
+class QuizSerializerWithoutReadOnlyFields(QuizSerializer):
+    start_date = serializers.DateTimeField(read_only=True)
 
 
 class AnswerSerializer(serializers.Serializer):
